@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Grid,
   Box,
   CircularProgress,
   Typography,
   Alert,
-  Container,
 } from '@mui/material';
 import { Product } from '../entities/product/model/types';
 import { fetchProducts } from '../shared/api/products';
@@ -19,6 +18,7 @@ import { useUrlSyncedFilters } from '../features/urlSyncedFilters/hooks';
 /**
  * CatalogPage - главная страница каталога товаров.
  * Управляет загрузкой данных, фильтрацией и отображением.
+ * Все данные мемоизированы для оптимизации производительности.
  */
 const CatalogPage: React.FC = () => {
   const [products, setProducts] = React.useState<Product[]>([]);
@@ -41,9 +41,27 @@ const CatalogPage: React.FC = () => {
     load();
   }, []);
 
-  // Получаем доступные категории
-  const categories = React.useMemo(() => {
+  // Мемоизируем доступные категории
+  const categories = useMemo(() => {
     const set = new Set<string>(products.map((p) => p.category));
+    return Array.from(set).sort();
+  }, [products]);
+
+  // Мемоизируем доступные бренды
+  const brands = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.brand) set.add(p.brand);
+    });
+    return Array.from(set).sort();
+  }, [products]);
+
+  // Мемоизируем доступные теги
+  const tags = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      p.tags.forEach((tag) => set.add(tag));
+    });
     return Array.from(set).sort();
   }, [products]);
 
@@ -51,28 +69,56 @@ const CatalogPage: React.FC = () => {
   const {
     filters,
     updateCategories,
+    updateBrands,
+    updateTags,
     updateInStock,
     updateRating,
     minPriceInput,
     maxPriceInput,
+    minDiscountInput,
+    minStockInput,
     updateMinPriceInput,
     updateMaxPriceInput,
+    updateMinDiscountInput,
+    updateMinStockInput,
     resetFilters,
-  } = useUrlSyncedFilters(categories);
+  } = useUrlSyncedFilters(categories, brands, tags);
 
-  // Применяем фильтры к товарам
-  const filteredProducts = React.useMemo(
+  // Мемоизируем отфильтрованные продукты
+  const filteredProducts = useMemo(
     () => applyFilters(products, filters),
     [products, filters],
+  );
+
+  // Мемоизируем обработчики удаления фильтров
+  const handleRemoveCategory = useCallback(
+    (cat: string) => {
+      updateCategories(filters.categories.filter((c) => c !== cat));
+    },
+    [filters.categories, updateCategories],
+  );
+
+  const handleRemoveBrand = useCallback(
+    (brand: string) => {
+      updateBrands(filters.brands.filter((b) => b !== brand));
+    },
+    [filters.brands, updateBrands],
+  );
+
+  const handleRemoveTag = useCallback(
+    (tag: string) => {
+      updateTags(filters.tags.filter((t) => t !== tag));
+    },
+    [filters.tags, updateTags],
   );
 
   return (
     <Box>
       {/* Заголовок страницы */}
       <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          component="h1"
+        <Typography 
+          variant="h4" 
+          component="h1" 
           gutterBottom
           sx={{ fontWeight: 700 }}
         >
@@ -83,19 +129,29 @@ const CatalogPage: React.FC = () => {
       <Grid container spacing={4}>
         {/* Панель фильтров */}
         <Grid item xs={12} md={3}>
-          <FiltersPanel
-            categories={categories}
-            filters={filters}
-            minPriceInput={minPriceInput}
-            maxPriceInput={maxPriceInput}
-            onCategoriesChange={updateCategories}
-            onMinPriceInputChange={updateMinPriceInput}
-            onMaxPriceInputChange={updateMaxPriceInput}
-            onInStockChange={updateInStock}
-            onRatingChange={updateRating}
-          />
-          <Box sx={{ mt: 2 }}>
-            <ResetFiltersButton onReset={resetFilters} />
+          <Box sx={{ position: 'sticky', top: 16 }}>
+            <FiltersPanel
+              categories={categories}
+              brands={brands}
+              tags={tags}
+              filters={filters}
+              minPriceInput={minPriceInput}
+              maxPriceInput={maxPriceInput}
+              minDiscountInput={minDiscountInput}
+              minStockInput={minStockInput}
+              onCategoriesChange={updateCategories}
+              onBrandsChange={updateBrands}
+              onTagsChange={updateTags}
+              onMinPriceInputChange={updateMinPriceInput}
+              onMaxPriceInputChange={updateMaxPriceInput}
+              onMinDiscountInputChange={updateMinDiscountInput}
+              onMinStockInputChange={updateMinStockInput}
+              onInStockChange={updateInStock}
+              onRatingChange={updateRating}
+            />
+            <Box sx={{ mt: 2 }}>
+              <ResetFiltersButton onReset={resetFilters} />
+            </Box>
           </Box>
         </Grid>
 
@@ -104,11 +160,13 @@ const CatalogPage: React.FC = () => {
           {/* Активные фильтры */}
           <ActiveFilterChips
             filters={filters}
-            onRemoveCategory={(cat) =>
-              updateCategories(filters.categories.filter((c) => c !== cat))
-            }
+            onRemoveCategory={handleRemoveCategory}
+            onRemoveBrand={handleRemoveBrand}
+            onRemoveTag={handleRemoveTag}
             onClearMin={() => updateMinPriceInput('')}
             onClearMax={() => updateMaxPriceInput('')}
+            onClearDiscount={() => updateMinDiscountInput('')}
+            onClearMinStock={() => updateMinStockInput('')}
             onClearRating={() => updateRating(null)}
             onClearStock={() => updateInStock(false)}
           />
@@ -127,7 +185,7 @@ const CatalogPage: React.FC = () => {
             </Alert>
           )}
 
-          {/* Сетка товаров */}
+          {/* Сетка товаров с пагинацией */}
           {!loading && !error && <ProductsGrid products={filteredProducts} />}
         </Grid>
       </Grid>

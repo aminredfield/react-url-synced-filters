@@ -11,10 +11,10 @@ import CatalogPage from '../pages/CatalogPage';
 const App: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar
-        position="sticky"
+      <AppBar 
+        position="sticky" 
         elevation={0}
-        sx={{
+        sx={{ 
           backgroundColor: 'background.paper',
           borderBottom: '1px solid',
           borderColor: 'divider',
@@ -22,10 +22,10 @@ const App: React.FC = () => {
       >
         <Toolbar>
           <StorefrontIcon sx={{ mr: 2, color: 'primary.main', fontSize: 32 }} />
-          <Typography
-            variant="h5"
-            component="div"
-            sx={{
+          <Typography 
+            variant="h5" 
+            component="div" 
+            sx={{ 
               flexGrow: 1,
               color: 'text.primary',
               fontWeight: 700,
@@ -35,11 +35,11 @@ const App: React.FC = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-
-      <Container
-        maxWidth="xl"
-        sx={{
-          flex: 1,
+      
+      <Container 
+        maxWidth="xl" 
+        sx={{ 
+          flex: 1, 
           py: 4,
         }}
       >
@@ -48,12 +48,12 @@ const App: React.FC = () => {
         </Routes>
       </Container>
 
-      <Box
-        component="footer"
-        sx={{
-          py: 3,
-          px: 2,
-          mt: 'auto',
+      <Box 
+        component="footer" 
+        sx={{ 
+          py: 3, 
+          px: 2, 
+          mt: 'auto', 
           backgroundColor: 'background.paper',
           borderTop: '1px solid',
           borderColor: 'divider',

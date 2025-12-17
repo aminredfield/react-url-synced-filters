@@ -4,10 +4,22 @@
 export interface Product {
   id: number;
   title: string;
-  price: number;
+  description: string;
   category: string;
-  inStock: boolean;
+  price: number;
+  discountPercentage: number;
   rating: number;
+  stock: number;
+  tags: string[];
+  brand?: string;
+  sku: string;
+  weight: number;
+  images: string[];
+  thumbnail: string;
+  availabilityStatus: string;
+  minimumOrderQuantity: number;
+  // Вычисляемое поле для обратной совместимости
+  inStock: boolean;
 }
 
 /**
@@ -16,10 +28,14 @@ export interface Product {
  */
 export interface Filters {
   categories: string[];
+  brands: string[];
+  tags: string[];
   minPrice: number | null;
   maxPrice: number | null;
+  minDiscount: number | null;
   inStock: boolean;
   rating: number | null;
+  minStock: number | null;
 }
 
 /**
@@ -27,8 +43,12 @@ export interface Filters {
  */
 export const defaultFilters: Filters = {
   categories: [],
+  brands: [],
+  tags: [],
   minPrice: null,
   maxPrice: null,
+  minDiscount: null,
   inStock: false,
   rating: null,
+  minStock: null,
 };

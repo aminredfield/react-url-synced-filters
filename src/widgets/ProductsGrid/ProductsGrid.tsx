@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { Grid, Box, Typography, Pagination, Stack } from '@mui/material';
+import { useSearchParams } from 'react-router-dom';
 import { Product } from '../../entities/product/model/types';
 import ProductCard from '../../entities/product/ui/ProductCard';
+import { parsePageFromQuery, setPageInQuery } from '../../shared/utils/query';
 
 interface Props {
   products: Product[];
@@ -10,37 +12,53 @@ interface Props {
 
 /**
  * ProductsGrid отображает карточки товаров в адаптивной сетке
- * с красивой пагинацией внизу.
+ * с красивой пагинацией внизу. Пагинация синхронизирована с URL.
  */
 const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Читаем текущую страницу из URL
+  const currentPage = useMemo(() => parsePageFromQuery(searchParams), [searchParams]);
+  
   // Вычисляем общее количество страниц
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-
+  const totalPages = useMemo(
+    () => Math.ceil(products.length / itemsPerPage),
+    [products.length, itemsPerPage],
+  );
+  
   // Вычисляем индексы для текущей страницы
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = products.slice(startIndex, endIndex);
-
-  // Обработчик смены страницы
+  const { startIndex, endIndex, currentProducts } = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return {
+      startIndex: start,
+      endIndex: end,
+      currentProducts: products.slice(start, end),
+    };
+  }, [currentPage, itemsPerPage, products]);
+  
+  // Обработчик смены страницы - обновляет URL
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
-    setCurrentPage(page);
+    const newParams = setPageInQuery(searchParams, page);
+    setSearchParams(newParams);
     // Прокручиваем к началу списка товаров
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  // Сбрасываем страницу на первую при изменении списка товаров
+  
+  // Сбрасываем на первую страницу если текущая страница больше общего количества
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [products.length]);
+    if (currentPage > totalPages && totalPages > 0) {
+      const newParams = setPageInQuery(searchParams, 1);
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [currentPage, totalPages, searchParams, setSearchParams]);
 
   if (products.length === 0) {
     return (
-      <Box
-        sx={{
-          mt: 4,
-          p: 6,
+      <Box 
+        sx={{ 
+          mt: 4, 
+          p: 6, 
           textAlign: 'center',
           backgroundColor: 'background.paper',
           borderRadius: 2,
@@ -78,15 +96,15 @@ const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
 
       {/* Пагинация */}
       {totalPages > 1 && (
-        <Stack
-          spacing={2}
-          alignItems="center"
-          sx={{
+        <Stack 
+          spacing={2} 
+          alignItems="center" 
+          sx={{ 
             mt: 5,
             mb: 2,
           }}
         >
-          <Pagination
+          <Pagination 
             count={totalPages}
             page={currentPage}
             onChange={handlePageChange}

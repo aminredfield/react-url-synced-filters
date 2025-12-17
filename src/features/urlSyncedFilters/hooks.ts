@@ -8,12 +8,16 @@ import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue';
  * Хук читает состояние фильтров из URL и предоставляет функции
  * для записи изменений обратно в URL.
  */
-export function useUrlSyncedFilters(availableCategories: string[]) {
+export function useUrlSyncedFilters(
+  availableCategories: string[],
+  availableBrands: string[],
+  availableTags: string[],
+) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters: Filters = useMemo(
-    () => parseQueryToFilters(searchParams, availableCategories),
-    [searchParams, availableCategories],
+    () => parseQueryToFilters(searchParams, availableCategories, availableBrands, availableTags),
+    [searchParams, availableCategories, availableBrands, availableTags],
   );
 
   const [minPriceInput, setMinPriceInput] = useState<string>(
@@ -22,14 +26,24 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
   const [maxPriceInput, setMaxPriceInput] = useState<string>(
     filters.maxPrice != null ? String(filters.maxPrice) : '',
   );
+  const [minDiscountInput, setMinDiscountInput] = useState<string>(
+    filters.minDiscount != null ? String(filters.minDiscount) : '',
+  );
+  const [minStockInput, setMinStockInput] = useState<string>(
+    filters.minStock != null ? String(filters.minStock) : '',
+  );
 
   useEffect(() => {
     setMinPriceInput(filters.minPrice != null ? String(filters.minPrice) : '');
     setMaxPriceInput(filters.maxPrice != null ? String(filters.maxPrice) : '');
-  }, [filters.minPrice, filters.maxPrice]);
+    setMinDiscountInput(filters.minDiscount != null ? String(filters.minDiscount) : '');
+    setMinStockInput(filters.minStock != null ? String(filters.minStock) : '');
+  }, [filters.minPrice, filters.maxPrice, filters.minDiscount, filters.minStock]);
 
   const debouncedMin = useDebouncedValue(minPriceInput, 400);
   const debouncedMax = useDebouncedValue(maxPriceInput, 400);
+  const debouncedDiscount = useDebouncedValue(minDiscountInput, 400);
+  const debouncedStock = useDebouncedValue(minStockInput, 400);
 
   useEffect(() => {
     const parseVal = (val: string): number | null => {
@@ -40,6 +54,7 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
       }
       return n;
     };
+    
     let newMin = parseVal(debouncedMin);
     let newMax = parseVal(debouncedMax);
     if (newMin != null && newMax != null && newMin > newMax) {
@@ -47,17 +62,33 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
       newMin = newMax;
       newMax = tmp;
     }
-    if (newMin !== filters.minPrice || newMax !== filters.maxPrice) {
+    
+    const newDiscount = parseVal(debouncedDiscount);
+    const newStock = parseVal(debouncedStock);
+    
+    if (
+      newMin !== filters.minPrice || 
+      newMax !== filters.maxPrice ||
+      newDiscount !== filters.minDiscount ||
+      newStock !== filters.minStock
+    ) {
       const updated: Filters = {
         ...filters,
         minPrice: newMin,
         maxPrice: newMax,
+        minDiscount: newDiscount,
+        minStock: newStock,
       };
       const params = filtersToQuery(updated);
+      // Сохраняем страницу если она есть
+      const currentPage = searchParams.get('page');
+      if (currentPage) {
+        params.set('page', currentPage);
+      }
       setSearchParams(params, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedMin, debouncedMax]);
+  }, [debouncedMin, debouncedMax, debouncedDiscount, debouncedStock]);
 
   const updateCategories = useCallback(
     (cats: string[]) => {
@@ -66,6 +97,34 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
         categories: cats,
       };
       const params = filtersToQuery(updated);
+      // Сбрасываем на первую страницу при изменении фильтров
+      params.delete('page');
+      setSearchParams(params);
+    },
+    [filters, setSearchParams],
+  );
+
+  const updateBrands = useCallback(
+    (brands: string[]) => {
+      const updated: Filters = {
+        ...filters,
+        brands,
+      };
+      const params = filtersToQuery(updated);
+      params.delete('page');
+      setSearchParams(params);
+    },
+    [filters, setSearchParams],
+  );
+
+  const updateTags = useCallback(
+    (tags: string[]) => {
+      const updated: Filters = {
+        ...filters,
+        tags,
+      };
+      const params = filtersToQuery(updated);
+      params.delete('page');
       setSearchParams(params);
     },
     [filters, setSearchParams],
@@ -78,6 +137,7 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
         inStock: value,
       };
       const params = filtersToQuery(updated);
+      params.delete('page');
       setSearchParams(params);
     },
     [filters, setSearchParams],
@@ -90,6 +150,7 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
         rating: value,
       };
       const params = filtersToQuery(updated);
+      params.delete('page');
       setSearchParams(params);
     },
     [filters, setSearchParams],
@@ -103,6 +164,14 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
     setMaxPriceInput(val);
   }, []);
 
+  const updateMinDiscountInput = useCallback((val: string) => {
+    setMinDiscountInput(val);
+  }, []);
+
+  const updateMinStockInput = useCallback((val: string) => {
+    setMinStockInput(val);
+  }, []);
+
   const resetFilters = useCallback(() => {
     setSearchParams({}, { replace: true });
   }, [setSearchParams]);
@@ -110,12 +179,18 @@ export function useUrlSyncedFilters(availableCategories: string[]) {
   return {
     filters,
     updateCategories,
+    updateBrands,
+    updateTags,
     updateInStock,
     updateRating,
     minPriceInput,
     maxPriceInput,
+    minDiscountInput,
+    minStockInput,
     updateMinPriceInput,
     updateMaxPriceInput,
+    updateMinDiscountInput,
+    updateMinStockInput,
     resetFilters,
   };
 }

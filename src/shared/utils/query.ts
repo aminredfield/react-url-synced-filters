@@ -7,6 +7,8 @@ import { Filters } from '../../entities/product/model/types';
 export function parseQueryToFilters(
   searchParams: URLSearchParams,
   availableCategories: string[],
+  availableBrands: string[],
+  availableTags: string[],
 ): Filters {
   // Парсим категории (через запятую)
   const catParam = searchParams.get('cat');
@@ -16,6 +18,26 @@ export function parseQueryToFilters(
     categories = parts
       .map((p) => decodeURIComponent(p))
       .filter((c) => availableCategories.includes(c));
+  }
+
+  // Парсим бренды
+  const brandParam = searchParams.get('brand');
+  let brands: string[] = [];
+  if (brandParam) {
+    const parts = brandParam.split(',');
+    brands = parts
+      .map((p) => decodeURIComponent(p))
+      .filter((b) => availableBrands.includes(b));
+  }
+
+  // Парсим теги
+  const tagParam = searchParams.get('tags');
+  let tags: string[] = [];
+  if (tagParam) {
+    const parts = tagParam.split(',');
+    tags = parts
+      .map((p) => decodeURIComponent(p))
+      .filter((t) => availableTags.includes(t));
   }
 
   // Парсим минимальную цену
@@ -45,6 +67,16 @@ export function parseQueryToFilters(
     maxPrice = tmp;
   }
 
+  // Парсим минимальную скидку
+  let minDiscount: number | null = null;
+  const discountParam = searchParams.get('discount');
+  if (discountParam !== null && discountParam !== '') {
+    const n = Number(discountParam);
+    if (!Number.isNaN(n) && n >= 0 && n <= 100) {
+      minDiscount = n;
+    }
+  }
+
   // Парсим наличие (truthy значения)
   const stockParam = searchParams.get('stock');
   const inStock =
@@ -52,6 +84,16 @@ export function parseQueryToFilters(
     stockParam === 'true' ||
     stockParam === 'yes' ||
     stockParam === 'on';
+
+  // Парсим минимальное количество на складе
+  let minStock: number | null = null;
+  const minStockParam = searchParams.get('minStock');
+  if (minStockParam !== null && minStockParam !== '') {
+    const n = Number(minStockParam);
+    if (!Number.isNaN(n) && n >= 0) {
+      minStock = n;
+    }
+  }
 
   // Парсим рейтинг
   let rating: number | null = null;
@@ -66,10 +108,14 @@ export function parseQueryToFilters(
 
   return {
     categories,
+    brands,
+    tags,
     minPrice,
     maxPrice,
+    minDiscount,
     inStock,
     rating,
+    minStock,
   };
 }
 
@@ -85,17 +131,65 @@ export function filtersToQuery(filters: Filters): URLSearchParams {
       .join(',');
     params.set('cat', encoded);
   }
+  
+  if (filters.brands.length > 0) {
+    const encoded = filters.brands
+      .map((b) => encodeURIComponent(b))
+      .join(',');
+    params.set('brand', encoded);
+  }
+  
+  if (filters.tags.length > 0) {
+    const encoded = filters.tags
+      .map((t) => encodeURIComponent(t))
+      .join(',');
+    params.set('tags', encoded);
+  }
+  
   if (filters.minPrice != null) {
     params.set('min', String(filters.minPrice));
   }
   if (filters.maxPrice != null) {
     params.set('max', String(filters.maxPrice));
   }
+  if (filters.minDiscount != null) {
+    params.set('discount', String(filters.minDiscount));
+  }
   if (filters.inStock) {
     params.set('stock', '1');
+  }
+  if (filters.minStock != null) {
+    params.set('minStock', String(filters.minStock));
   }
   if (filters.rating != null) {
     params.set('rating', String(filters.rating));
   }
   return params;
+}
+
+/**
+ * Парсит номер страницы из URL
+ */
+export function parsePageFromQuery(searchParams: URLSearchParams): number {
+  const pageParam = searchParams.get('page');
+  if (pageParam) {
+    const page = Number(pageParam);
+    if (!Number.isNaN(page) && page > 0) {
+      return page;
+    }
+  }
+  return 1;
+}
+
+/**
+ * Устанавливает номер страницы в URLSearchParams
+ */
+export function setPageInQuery(params: URLSearchParams, page: number): URLSearchParams {
+  const newParams = new URLSearchParams(params);
+  if (page > 1) {
+    newParams.set('page', String(page));
+  } else {
+    newParams.delete('page');
+  }
+  return newParams;
 }
