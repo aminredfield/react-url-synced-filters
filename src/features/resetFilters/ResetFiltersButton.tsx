@@ -7,7 +7,7 @@ interface Props {
 }
 
 /**
- * ResetFiltersButton - кнопка для сброса всех фильтров.
+ * ResetFiltersButton - button to reset all filters.
  */
 const ResetFiltersButton: React.FC<Props> = ({ onReset }) => {
   return (
@@ -20,7 +20,7 @@ const ResetFiltersButton: React.FC<Props> = ({ onReset }) => {
         fontWeight: 600,
       }}
     >
-      Сбросить фильтры
+      Reset Filters
     </Button>
   );
 };

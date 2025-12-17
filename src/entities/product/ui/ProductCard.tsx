@@ -19,11 +19,11 @@ interface Props {
 }
 
 /**
- * ProductCard отображает краткую информацию о товаре.
- * Использует современный дизайн с улучшенной визуальной иерархией.
+ * ProductCard displays brief product information.
+ * Uses modern design with improved visual hierarchy.
  */
 const ProductCard: React.FC<Props> = ({ product }) => {
-  // Берем первое изображение или thumbnail
+  // Take first image or thumbnail
   const imageUrl = product.images.length > 0 ? product.images[0] : product.thumbnail;
   
   return (
@@ -37,7 +37,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
         overflow: 'hidden',
       }}
     >
-      {/* Изображение товара */}
+      {/* Product image */}
       {imageUrl && (
         <CardMedia
           component="img"
@@ -51,7 +51,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
         />
       )}
       
-      {/* Бейдж скидки */}
+      {/* Discount badge */}
       {product.discountPercentage > 0 && (
         <Box
           sx={{
@@ -77,7 +77,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
       )}
       
       <CardContent sx={{ flexGrow: 1, pb: 2 }}>
-        {/* Название товара */}
+        {/* Product title */}
         <Typography 
           variant="h6" 
           component="div" 
@@ -91,7 +91,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           {product.title}
         </Typography>
         
-        {/* Бренд и категория */}
+        {/* Brand and category */}
         <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
           {product.brand && (
             <Typography 
@@ -122,7 +122,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           </Typography>
         </Stack>
         
-        {/* Рейтинг */}
+        {/* Rating */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Rating
             value={product.rating}
@@ -136,7 +136,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           </Typography>
         </Box>
         
-        {/* Цена */}
+        {/* Price */}
         <Box sx={{ mb: 1.5 }}>
           {product.discountPercentage > 0 ? (
             <Box>
@@ -174,12 +174,12 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           )}
         </Box>
         
-        {/* Статусы */}
+        {/* Status */}
         <Stack direction="row" spacing={1} flexWrap="wrap">
           {product.inStock ? (
             <Chip 
               icon={<CheckCircleIcon />}
-              label={`В наличии: ${product.stock}`}
+              label={`In Stock: ${product.stock}`}
               color="success" 
               size="small" 
               sx={{ 
@@ -189,7 +189,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           ) : (
             <Chip 
               icon={<CancelIcon />}
-              label="Нет в наличии" 
+              label="Out of Stock" 
               color="default" 
               size="small"
               sx={{ 

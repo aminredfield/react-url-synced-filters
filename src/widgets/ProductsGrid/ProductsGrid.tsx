@@ -11,8 +11,8 @@ interface Props {
 }
 
 /**
- * ProductsGrid отображает карточки товаров в адаптивной сетке
- * с красивой пагинацией внизу. Пагинация синхронизирована с URL.
+ * ProductsGrid displays product cards in responsive grid
+ * with beautiful pagination at the bottom. Pagination is synced with URL.
  */
 const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,10 +67,10 @@ const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
         }}
       >
         <Typography variant="h6" color="text.secondary" gutterBottom>
-          Товары не найдены
+          No products found
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Попробуйте изменить параметры фильтра
+          Try changing filter parameters
         </Typography>
       </Box>
     );
@@ -78,14 +78,14 @@ const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
 
   return (
     <Box>
-      {/* Информация о результатах */}
+      {/* Results info */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="body2" color="text.secondary">
-          Показано {startIndex + 1}–{Math.min(endIndex, products.length)} из {products.length} товаров
+          Showing {startIndex + 1}–{Math.min(endIndex, products.length)} of {products.length} products
         </Typography>
       </Box>
 
-      {/* Сетка товаров */}
+      {/* Product grid */}
       <Grid container spacing={3}>
         {currentProducts.map((product) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
@@ -94,7 +94,7 @@ const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
         ))}
       </Grid>
 
-      {/* Пагинация */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <Stack 
           spacing={2} 
@@ -121,7 +121,7 @@ const ProductsGrid: React.FC<Props> = ({ products, itemsPerPage = 12 }) => {
             }}
           />
           <Typography variant="caption" color="text.secondary">
-            Страница {currentPage} из {totalPages}
+            Page {currentPage} of {totalPages}
           </Typography>
         </Stack>
       )}

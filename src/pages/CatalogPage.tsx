@@ -16,9 +16,9 @@ import ResetFiltersButton from '../features/resetFilters/ResetFiltersButton';
 import { useUrlSyncedFilters } from '../features/urlSyncedFilters/hooks';
 
 /**
- * CatalogPage - главная страница каталога товаров.
- * Управляет загрузкой данных, фильтрацией и отображением.
- * Все данные мемоизированы для оптимизации производительности.
+ * CatalogPage - main catalog page.
+ * Manages data loading, filtering and display.
+ * All data is memoized for performance optimization.
  */
 const CatalogPage: React.FC = () => {
   const [products, setProducts] = React.useState<Product[]>([]);
@@ -114,20 +114,20 @@ const CatalogPage: React.FC = () => {
 
   return (
     <Box>
-      {/* Заголовок страницы */}
+      {/* Page title */}
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h4" 
-          component="h1" 
+        <Typography
+          variant="h4"
+          component="h1"
           gutterBottom
           sx={{ fontWeight: 700 }}
         >
-          Каталог товаров
+          Product Catalog
         </Typography>
       </Box>
 
       <Grid container spacing={4}>
-        {/* Панель фильтров */}
+        {/* Filters panel */}
         <Grid item xs={12} md={3}>
           <Box sx={{ position: 'sticky', top: 16 }}>
             <FiltersPanel
@@ -155,9 +155,9 @@ const CatalogPage: React.FC = () => {
           </Box>
         </Grid>
 
-        {/* Список товаров */}
+        {/* Product list */}
         <Grid item xs={12} md={9}>
-          {/* Активные фильтры */}
+          {/* Active filters */}
           <ActiveFilterChips
             filters={filters}
             onRemoveCategory={handleRemoveCategory}
@@ -171,21 +171,21 @@ const CatalogPage: React.FC = () => {
             onClearStock={() => updateInStock(false)}
           />
 
-          {/* Состояние загрузки */}
+          {/* Loading state */}
           {loading && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
               <CircularProgress size={60} />
             </Box>
           )}
 
-          {/* Ошибка */}
+          {/* Error */}
           {error && (
             <Alert severity="error" sx={{ mt: 4 }}>
               {error}
             </Alert>
           )}
 
-          {/* Сетка товаров с пагинацией */}
+          {/* Product grid with pagination */}
           {!loading && !error && <ProductsGrid products={filteredProducts} />}
         </Grid>
       </Grid>

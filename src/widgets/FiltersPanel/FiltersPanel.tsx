@@ -53,7 +53,7 @@ const MenuProps = {
 };
 
 /**
- * FiltersPanel - расширенная панель фильтров с аккордеонами.
+ * FiltersPanel - advanced filters panel with accordions.
  */
 const FiltersPanel: React.FC<Props> = ({
   categories,
@@ -108,29 +108,29 @@ const FiltersPanel: React.FC<Props> = ({
         borderColor: 'divider',
       }}
     >
-      {/* Заголовок */}
+      {/* Header */}
       <Box sx={{ p: 3, pb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <FilterListIcon sx={{ mr: 1, color: 'primary.main' }} />
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Фильтры
+            Filters
           </Typography>
         </Box>
       </Box>
 
       <Divider />
 
-      {/* Основные фильтры */}
+      {/* Main filters */}
       <Box sx={{ p: 3, pt: 2 }}>
-        {/* Категории */}
+        {/* Categories */}
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="category-label">Категории</InputLabel>
+          <InputLabel id="category-label">Categories</InputLabel>
           <Select
             labelId="category-label"
             multiple
             value={filters.categories}
             onChange={handleCategoryChange}
-            input={<OutlinedInput label="Категории" />}
+            input={<OutlinedInput label="Categories" />}
             renderValue={(selected) => selected.join(', ')}
             MenuProps={MenuProps}
           >
@@ -143,16 +143,16 @@ const FiltersPanel: React.FC<Props> = ({
           </Select>
         </FormControl>
 
-        {/* Бренды */}
+        {/* Brands */}
         {brands.length > 0 && (
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="brand-label">Бренды</InputLabel>
+            <InputLabel id="brand-label">Brands</InputLabel>
             <Select
               labelId="brand-label"
               multiple
               value={filters.brands}
               onChange={handleBrandChange}
-              input={<OutlinedInput label="Бренды" />}
+              input={<OutlinedInput label="Brands" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
@@ -166,16 +166,16 @@ const FiltersPanel: React.FC<Props> = ({
           </FormControl>
         )}
 
-        {/* Теги */}
+        {/* Tags */}
         {tags.length > 0 && (
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="tag-label">Теги</InputLabel>
+            <InputLabel id="tag-label">Tags</InputLabel>
             <Select
               labelId="tag-label"
               multiple
               value={filters.tags}
               onChange={handleTagChange}
-              input={<OutlinedInput label="Теги" />}
+              input={<OutlinedInput label="Tags" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
@@ -189,16 +189,16 @@ const FiltersPanel: React.FC<Props> = ({
           </FormControl>
         )}
 
-        {/* Рейтинг */}
+        {/* Rating */}
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="rating-label">Минимальный рейтинг</InputLabel>
+          <InputLabel id="rating-label">Minimum Rating</InputLabel>
           <Select
             labelId="rating-label"
             value={filters.rating ?? ''}
             onChange={handleRatingChange}
-            label="Минимальный рейтинг"
+            label="Minimum Rating"
           >
-            <MenuItem value="">Любой</MenuItem>
+            <MenuItem value="">Any</MenuItem>
             <MenuItem value={5}>⭐⭐⭐⭐⭐ (5)</MenuItem>
             <MenuItem value={4}>⭐⭐⭐⭐ (4+)</MenuItem>
             <MenuItem value={3}>⭐⭐⭐ (3+)</MenuItem>
@@ -207,7 +207,7 @@ const FiltersPanel: React.FC<Props> = ({
           </Select>
         </FormControl>
 
-        {/* В наличии */}
+        {/* In stock */}
         <FormControlLabel
           control={
             <Checkbox
@@ -216,7 +216,7 @@ const FiltersPanel: React.FC<Props> = ({
               color="primary"
             />
           }
-          label="Только в наличии"
+          label="In Stock Only"
           sx={{ 
             '& .MuiFormControlLabel-label': {
               fontWeight: 500,
@@ -227,15 +227,15 @@ const FiltersPanel: React.FC<Props> = ({
 
       <Divider />
 
-      {/* Дополнительные фильтры в аккордеонах */}
+      {/* Additional filters in accordions */}
       <Accordion elevation={0} disableGutters>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>Цена</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Price Range</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <TextField
-              label="Мин"
+              label="Min"
               type="number"
               value={minPriceInput}
               onChange={(e) => onMinPriceInputChange(e.target.value)}
@@ -244,7 +244,7 @@ const FiltersPanel: React.FC<Props> = ({
               inputProps={{ min: 0, step: 1 }}
             />
             <TextField
-              label="Макс"
+              label="Max"
               type="number"
               value={maxPriceInput}
               onChange={(e) => onMaxPriceInputChange(e.target.value)}
@@ -258,36 +258,36 @@ const FiltersPanel: React.FC<Props> = ({
 
       <Accordion elevation={0} disableGutters>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>Скидка</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Discount</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
-            label="Минимальная скидка (%)"
+            label="Minimum Discount (%)"
             type="number"
             value={minDiscountInput}
             onChange={(e) => onMinDiscountInputChange(e.target.value)}
             size="small"
             fullWidth
             inputProps={{ min: 0, max: 100, step: 5 }}
-            helperText="Товары со скидкой от указанного процента"
+            helperText="Products with discount from specified percentage"
           />
         </AccordionDetails>
       </Accordion>
 
       <Accordion elevation={0} disableGutters>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>Наличие на складе</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Stock Availability</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
-            label="Минимальное количество"
+            label="Minimum Quantity"
             type="number"
             value={minStockInput}
             onChange={(e) => onMinStockInputChange(e.target.value)}
             size="small"
             fullWidth
             inputProps={{ min: 0, step: 10 }}
-            helperText="Товары с количеством на складе от указанного"
+            helperText="Products with stock quantity from specified amount"
           />
         </AccordionDetails>
       </Accordion>

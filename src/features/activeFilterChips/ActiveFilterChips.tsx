@@ -16,8 +16,8 @@ interface Props {
 }
 
 /**
- * ActiveFilterChips отображает активные фильтры в виде чипов
- * с возможностью их удаления.
+ * ActiveFilterChips displays active filters as chips
+ * with ability to remove them.
  */
 const ActiveFilterChips: React.FC<Props> = ({
   filters,
@@ -34,12 +34,12 @@ const ActiveFilterChips: React.FC<Props> = ({
   const chips = useMemo(() => {
     const result: React.ReactNode[] = [];
 
-    // Чипы для категорий
+    // Category chips
     filters.categories.forEach((cat) => {
       result.push(
         <Chip
           key={`cat-${cat}`}
-          label={`Категория: ${cat}`}
+          label={`Category: ${cat}`}
           onDelete={() => onRemoveCategory(cat)}
           color="primary"
           variant="outlined"
@@ -48,12 +48,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     });
 
-    // Чипы для брендов
+    // Brand chips
     filters.brands.forEach((brand) => {
       result.push(
         <Chip
           key={`brand-${brand}`}
-          label={`Бренд: ${brand}`}
+          label={`Brand: ${brand}`}
           onDelete={() => onRemoveBrand(brand)}
           color="secondary"
           variant="outlined"
@@ -62,7 +62,7 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     });
 
-    // Чипы для тегов
+    // Tag chips
     filters.tags.forEach((tag) => {
       result.push(
         <Chip
@@ -77,12 +77,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     });
 
-    // Чип минимальной цены
+    // Min price chip
     if (filters.minPrice != null) {
       result.push(
         <Chip
           key="minPrice"
-          label={`От $${filters.minPrice}`}
+          label={`From $${filters.minPrice}`}
           onDelete={onClearMin}
           color="success"
           variant="outlined"
@@ -91,12 +91,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     }
 
-    // Чип максимальной цены
+    // Max price chip
     if (filters.maxPrice != null) {
       result.push(
         <Chip
           key="maxPrice"
-          label={`До $${filters.maxPrice}`}
+          label={`Up to $${filters.maxPrice}`}
           onDelete={onClearMax}
           color="success"
           variant="outlined"
@@ -105,12 +105,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     }
 
-    // Чип минимальной скидки
+    // Min discount chip
     if (filters.minDiscount != null) {
       result.push(
         <Chip
           key="minDiscount"
-          label={`Скидка ≥ ${filters.minDiscount}%`}
+          label={`Discount ≥ ${filters.minDiscount}%`}
           onDelete={onClearDiscount}
           color="error"
           variant="outlined"
@@ -119,12 +119,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     }
 
-    // Чип минимального количества на складе
+    // Min stock chip
     if (filters.minStock != null) {
       result.push(
         <Chip
           key="minStock"
-          label={`На складе ≥ ${filters.minStock}`}
+          label={`Stock ≥ ${filters.minStock}`}
           onDelete={onClearMinStock}
           color="warning"
           variant="outlined"
@@ -133,12 +133,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     }
 
-    // Чип рейтинга
+    // Rating chip
     if (filters.rating != null) {
       result.push(
         <Chip
           key="rating"
-          label={`Рейтинг ≥ ${filters.rating}`}
+          label={`Rating ≥ ${filters.rating}`}
           onDelete={onClearRating}
           color="primary"
           variant="outlined"
@@ -147,12 +147,12 @@ const ActiveFilterChips: React.FC<Props> = ({
       );
     }
 
-    // Чип наличия
+    // In stock chip
     if (filters.inStock) {
       result.push(
         <Chip
           key="inStock"
-          label="Только в наличии"
+          label="In Stock Only"
           onDelete={onClearStock}
           color="success"
           variant="filled"
@@ -182,7 +182,7 @@ const ActiveFilterChips: React.FC<Props> = ({
   return (
     <Box sx={{ mb: 3 }}>
       <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-        Активные фильтры ({chips.length}):
+        Active Filters ({chips.length}):
       </Typography>
       <Box>{chips}</Box>
     </Box>
