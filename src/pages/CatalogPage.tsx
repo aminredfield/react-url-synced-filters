@@ -1,10 +1,11 @@
 import React from 'react';
 import {
-  Container,
   Grid,
   Box,
   CircularProgress,
   Typography,
+  Alert,
+  Container,
 } from '@mui/material';
 import { Product } from '../entities/product/model/types';
 import { fetchProducts } from '../shared/api/products';
@@ -16,17 +17,15 @@ import ResetFiltersButton from '../features/resetFilters/ResetFiltersButton';
 import { useUrlSyncedFilters } from '../features/urlSyncedFilters/hooks';
 
 /**
- * CatalogPage orchestrates loading the products, deriving available categories,
- * and wiring up the URL‑synchronised filters. It shows loading/error states,
- * a filters sidebar, active filter chips, and the resulting products grid.
+ * CatalogPage - главная страница каталога товаров.
+ * Управляет загрузкой данных, фильтрацией и отображением.
  */
 const CatalogPage: React.FC = () => {
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Fetch products on mount. If remote fetch fails, the API layer
-  // automatically falls back to local mocks.
+  // Загружаем продукты при монтировании
   React.useEffect(() => {
     const load = async () => {
       try {
@@ -34,7 +33,7 @@ const CatalogPage: React.FC = () => {
         setProducts(loaded);
       } catch (e) {
         console.error(e);
-        setError('Failed to load products.');
+        setError('Не удалось загрузить товары');
       } finally {
         setLoading(false);
       }
@@ -42,17 +41,13 @@ const CatalogPage: React.FC = () => {
     load();
   }, []);
 
-  // Derive the available categories from loaded products. Using a Set
-  // ensures uniqueness. Categories drive the category filter UI and also
-  // validation of incoming query parameters.
+  // Получаем доступные категории
   const categories = React.useMemo(() => {
     const set = new Set<string>(products.map((p) => p.category));
-    return Array.from(set);
+    return Array.from(set).sort();
   }, [products]);
 
-  // Pull URL‑synced filters. All update functions return new search params
-  // to ensure back/forward navigation works correctly. Min/max price inputs
-  // are debounced internally to avoid spamming the URL while typing.
+  // URL-синхронизированные фильтры
   const {
     filters,
     updateCategories,
@@ -65,17 +60,28 @@ const CatalogPage: React.FC = () => {
     resetFilters,
   } = useUrlSyncedFilters(categories);
 
-  // Apply filters to the products. useMemo avoids recomputing on every
-  // render when filters or products have not changed.
+  // Применяем фильтры к товарам
   const filteredProducts = React.useMemo(
     () => applyFilters(products, filters),
     [products, filters],
   );
 
   return (
-    <Container maxWidth="lg" sx={{ paddingY: 4 }}>
-      <Grid container spacing={3}>
-        {/* Filters sidebar */}
+    <Box>
+      {/* Заголовок страницы */}
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: 700 }}
+        >
+          Каталог товаров
+        </Typography>
+      </Box>
+
+      <Grid container spacing={4}>
+        {/* Панель фильтров */}
         <Grid item xs={12} md={3}>
           <FiltersPanel
             categories={categories}
@@ -93,9 +99,9 @@ const CatalogPage: React.FC = () => {
           </Box>
         </Grid>
 
-        {/* Products section */}
+        {/* Список товаров */}
         <Grid item xs={12} md={9}>
-          {/* Chips summarising the active filters with the ability to remove them */}
+          {/* Активные фильтры */}
           <ActiveFilterChips
             filters={filters}
             onRemoveCategory={(cat) =>
@@ -107,20 +113,25 @@ const CatalogPage: React.FC = () => {
             onClearStock={() => updateInStock(false)}
           />
 
+          {/* Состояние загрузки */}
           {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <CircularProgress />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+              <CircularProgress size={60} />
             </Box>
           )}
+
+          {/* Ошибка */}
           {error && (
-            <Box sx={{ mt: 4 }}>
-              <Typography color="error">{error}</Typography>
-            </Box>
+            <Alert severity="error" sx={{ mt: 4 }}>
+              {error}
+            </Alert>
           )}
+
+          {/* Сетка товаров */}
           {!loading && !error && <ProductsGrid products={filteredProducts} />}
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 };
 

@@ -2,11 +2,8 @@ import { Product } from '../../entities/product/model/types';
 import { products as localProducts } from '../mock/products';
 
 /**
- * Attempts to fetch products from a public API. If the request fails or
- * returns unexpected data, the local mock data set is returned instead.
- *
- * This function does not require any API keys or secrets and therefore
- * remains safe to include in a public repository.
+ * Пытается загрузить продукты из публичного API.
+ * При ошибке возвращает локальные mock данные.
  */
 export async function fetchProducts(): Promise<Product[]> {
   try {
@@ -29,7 +26,7 @@ export async function fetchProducts(): Promise<Product[]> {
     }
     throw new Error('Unexpected response shape');
   } catch (e) {
-    // If any error occurs (network, unexpected format), return local data.
+    // При любой ошибке возвращаем локальные данные
     return localProducts;
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip } from '@mui/material';
+import { Box, Chip, Typography } from '@mui/material';
 import { Filters } from '../../entities/product/model/types';
 
 interface Props {
@@ -12,8 +12,8 @@ interface Props {
 }
 
 /**
- * ActiveFilterChips summarises the currently applied filters and allows
- * users to remove individual filters directly via chip delete actions.
+ * ActiveFilterChips отображает активные фильтры в виде чипов
+ * с возможностью их удаления.
  */
 const ActiveFilterChips: React.FC<Props> = ({
   filters,
@@ -25,7 +25,7 @@ const ActiveFilterChips: React.FC<Props> = ({
 }) => {
   const chips: React.ReactNode[] = [];
 
-  // Render a chip per selected category
+  // Чипы для категорий
   filters.categories.forEach((cat) => {
     chips.push(
       <Chip
@@ -33,57 +33,63 @@ const ActiveFilterChips: React.FC<Props> = ({
         label={cat}
         onDelete={() => onRemoveCategory(cat)}
         color="primary"
+        variant="outlined"
         sx={{ mr: 1, mb: 1 }}
       />,
     );
   });
 
-  // Price chips
+  // Чип минимальной цены
   if (filters.minPrice != null) {
     chips.push(
       <Chip
         key="minPrice"
-        label={`Min: $${filters.minPrice}`}
+        label={`От $${filters.minPrice}`}
         onDelete={onClearMin}
         color="primary"
+        variant="outlined"
         sx={{ mr: 1, mb: 1 }}
       />,
     );
   }
 
+  // Чип максимальной цены
   if (filters.maxPrice != null) {
     chips.push(
       <Chip
         key="maxPrice"
-        label={`Max: $${filters.maxPrice}`}
+        label={`До $${filters.maxPrice}`}
         onDelete={onClearMax}
         color="primary"
+        variant="outlined"
         sx={{ mr: 1, mb: 1 }}
       />,
     );
   }
 
-  // Rating chip
+  // Чип рейтинга
   if (filters.rating != null) {
     chips.push(
       <Chip
         key="rating"
-        label={`Rating ≥ ${filters.rating}`}
+        label={`Рейтинг ≥ ${filters.rating}`}
         onDelete={onClearRating}
         color="primary"
+        variant="outlined"
         sx={{ mr: 1, mb: 1 }}
       />,
     );
   }
 
-  // Stock chip
+  // Чип наличия
   if (filters.inStock) {
     chips.push(
       <Chip
         key="inStock"
-        label="In Stock"
+        label="В наличии"
         onDelete={onClearStock}
         color="primary"
+        variant="outlined"
         sx={{ mr: 1, mb: 1 }}
       />,
     );
@@ -93,7 +99,14 @@ const ActiveFilterChips: React.FC<Props> = ({
     return null;
   }
 
-  return <Box sx={{ mb: 2 }}>{chips}</Box>;
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+        Активные фильтры:
+      </Typography>
+      <Box>{chips}</Box>
+    </Box>
+  );
 };
 
 export default ActiveFilterChips;

@@ -1,19 +1,26 @@
 import React from 'react';
 import { Button } from '@mui/material';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 interface Props {
   onReset: () => void;
 }
 
 /**
- * ResetFiltersButton triggers a complete reset of all filters. It is kept
- * separate from the filters panel to emphasise its importance and avoid
- * accidental clicks.
+ * ResetFiltersButton - кнопка для сброса всех фильтров.
  */
 const ResetFiltersButton: React.FC<Props> = ({ onReset }) => {
   return (
-    <Button variant="outlined" color="secondary" fullWidth onClick={onReset}>
-      Reset Filters
+    <Button
+      variant="outlined"
+      fullWidth
+      startIcon={<RestartAltIcon />}
+      onClick={onReset}
+      sx={{ 
+        fontWeight: 600,
+      }}
+    >
+      Сбросить фильтры
     </Button>
   );
 };

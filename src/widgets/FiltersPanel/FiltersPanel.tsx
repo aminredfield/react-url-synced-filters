@@ -11,7 +11,10 @@ import {
   FormControlLabel,
   TextField,
   Typography,
+  Paper,
+  Divider,
 } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { Filters } from '../../entities/product/model/types';
 
 interface Props {
@@ -26,22 +29,19 @@ interface Props {
   onRatingChange: (value: number | null) => void;
 }
 
-// Configures the height of the dropdown for category multi‑select
-const ITEM_HEIGHT = 40;
-const ITEM_PADDING_TOP = 4;
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 6.5 + ITEM_PADDING_TOP,
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
     },
   },
 };
 
 /**
- * FiltersPanel renders the filter controls. It is a presentational component
- * which receives state and handlers via props and delegates business logic
- * to higher level hooks. The UI uses MUI form components for consistency.
+ * FiltersPanel - современная панель фильтров с улучшенным дизайном.
  */
 const FiltersPanel: React.FC<Props> = ({
   categories,
@@ -54,9 +54,6 @@ const FiltersPanel: React.FC<Props> = ({
   onInStockChange,
   onRatingChange,
 }) => {
-  // Handle category multi‑select changes. MUI returns either a string or an
-  // array depending on how many values are selected. We normalise to an
-  // array of strings.
   const handleCategoryChange = (event: any) => {
     const {
       target: { value },
@@ -64,95 +61,111 @@ const FiltersPanel: React.FC<Props> = ({
     onCategoriesChange(typeof value === 'string' ? value.split(',') : value);
   };
 
-  // Handle rating select changes. An empty value means no rating filter.
   const handleRatingChange = (event: any) => {
-    const value = event.target.value;
-    if (value === '') {
-      onRatingChange(null);
-    } else {
-      onRatingChange(Number(value));
-    }
+    const val = event.target.value;
+    onRatingChange(val === '' ? null : Number(val));
   };
 
   return (
-    <Box sx={{ p: 1 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Filters
-      </Typography>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
+      {/* Заголовок */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <FilterListIcon sx={{ mr: 1, color: 'primary.main' }} />
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Фильтры
+        </Typography>
+      </Box>
 
-      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-        <InputLabel id="categories-label">Category</InputLabel>
+      <Divider sx={{ mb: 3 }} />
+
+      {/* Категории */}
+      <FormControl fullWidth sx={{ mb: 3 }}>
+        <InputLabel id="category-label">Категории</InputLabel>
         <Select
-          labelId="categories-label"
-          id="categories"
+          labelId="category-label"
           multiple
           value={filters.categories}
           onChange={handleCategoryChange}
-          input={<OutlinedInput label="Category" />}
-          renderValue={(selected) => (selected as string[]).join(', ')}
+          input={<OutlinedInput label="Категории" />}
+          renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
         >
-          {categories.map((name) => (
-            <MenuItem key={name} value={name}>
-              <Checkbox checked={filters.categories.indexOf(name) > -1} />
-              <ListItemText primary={name} />
+          {categories.map((cat) => (
+            <MenuItem key={cat} value={cat}>
+              <Checkbox checked={filters.categories.includes(cat)} />
+              <ListItemText primary={cat} />
             </MenuItem>
           ))}
         </Select>
       </FormControl>
 
-      <TextField
-        label="Min Price"
-        type="number"
-        size="small"
-        fullWidth
-        value={minPriceInput}
-        onChange={(e) => onMinPriceInputChange(e.target.value)}
-        sx={{ mb: 2 }}
-        inputProps={{ min: 0 }}
-      />
-      <TextField
-        label="Max Price"
-        type="number"
-        size="small"
-        fullWidth
-        value={maxPriceInput}
-        onChange={(e) => onMaxPriceInputChange(e.target.value)}
-        sx={{ mb: 2 }}
-        inputProps={{ min: 0 }}
-      />
+      {/* Цена */}
+      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+        Диапазон цен
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        <TextField
+          label="Мин"
+          type="number"
+          value={minPriceInput}
+          onChange={(e) => onMinPriceInputChange(e.target.value)}
+          size="small"
+          fullWidth
+          inputProps={{ min: 0, step: 1 }}
+        />
+        <TextField
+          label="Макс"
+          type="number"
+          value={maxPriceInput}
+          onChange={(e) => onMaxPriceInputChange(e.target.value)}
+          size="small"
+          fullWidth
+          inputProps={{ min: 0, step: 1 }}
+        />
+      </Box>
 
+      {/* Рейтинг */}
+      <FormControl fullWidth sx={{ mb: 3 }}>
+        <InputLabel id="rating-label">Минимальный рейтинг</InputLabel>
+        <Select
+          labelId="rating-label"
+          value={filters.rating ?? ''}
+          onChange={handleRatingChange}
+          label="Минимальный рейтинг"
+        >
+          <MenuItem value="">Любой</MenuItem>
+          <MenuItem value={5}>⭐⭐⭐⭐⭐ (5)</MenuItem>
+          <MenuItem value={4}>⭐⭐⭐⭐ (4+)</MenuItem>
+          <MenuItem value={3}>⭐⭐⭐ (3+)</MenuItem>
+          <MenuItem value={2}>⭐⭐ (2+)</MenuItem>
+          <MenuItem value={1}>⭐ (1+)</MenuItem>
+        </Select>
+      </FormControl>
+
+      {/* В наличии */}
       <FormControlLabel
         control={
           <Checkbox
             checked={filters.inStock}
             onChange={(e) => onInStockChange(e.target.checked)}
+            color="primary"
           />
         }
-        label="In stock"
-        sx={{ mb: 2 }}
+        label="Только в наличии"
+        sx={{
+          '& .MuiFormControlLabel-label': {
+            fontWeight: 500,
+          }
+        }}
       />
-
-      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-        <InputLabel id="rating-label">Rating ≥</InputLabel>
-        <Select
-          labelId="rating-label"
-          id="rating-select"
-          value={filters.rating ?? ''}
-          label="Rating ≥"
-          onChange={handleRatingChange}
-        >
-          <MenuItem value="">
-            <em>Any</em>
-          </MenuItem>
-          {[5, 4, 3, 2, 1].map((r) => (
-            <MenuItem key={r} value={r}>
-              {r} & up
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
+    </Paper>
   );
 };
 

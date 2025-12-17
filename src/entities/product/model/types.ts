@@ -1,6 +1,5 @@
 /**
- * Product represents a single item in the catalogue. Having a shared type
- * definition ensures consistency across the application.
+ * Product представляет один товар в каталоге.
  */
 export interface Product {
   id: number;
@@ -12,8 +11,8 @@ export interface Product {
 }
 
 /**
- * Filters represent the state of all available filter controls. When a
- * property is null it means the corresponding constraint is disabled.
+ * Filters представляет состояние всех доступных фильтров.
+ * Когда свойство null - соответствующее ограничение отключено.
  */
 export interface Filters {
   categories: string[];
@@ -24,7 +23,7 @@ export interface Filters {
 }
 
 /**
- * The initial filter state used when there are no query parameters.
+ * Начальное состояние фильтров (когда нет параметров в URL).
  */
 export const defaultFilters: Filters = {
   categories: [],

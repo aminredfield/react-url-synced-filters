@@ -1,16 +1,14 @@
 import { Filters } from '../../entities/product/model/types';
 
 /**
- * Parse URLSearchParams into a Filters object. All validations and
- * normalisations specified in the task are implemented here. Unknown
- * categories are ignored, negative price values are removed, and min/max
- * ordering is corrected. Rating is clamped between 0 and 5.
+ * Парсит URLSearchParams в объект Filters.
+ * Все валидации и нормализации выполняются здесь.
  */
 export function parseQueryToFilters(
   searchParams: URLSearchParams,
   availableCategories: string[],
 ): Filters {
-  // parse categories (comma separated)
+  // Парсим категории (через запятую)
   const catParam = searchParams.get('cat');
   let categories: string[] = [];
   if (catParam) {
@@ -20,7 +18,7 @@ export function parseQueryToFilters(
       .filter((c) => availableCategories.includes(c));
   }
 
-  // parse min price
+  // Парсим минимальную цену
   let minPrice: number | null = null;
   const minParam = searchParams.get('min');
   if (minParam !== null && minParam !== '') {
@@ -30,7 +28,7 @@ export function parseQueryToFilters(
     }
   }
 
-  // parse max price
+  // Парсим максимальную цену
   let maxPrice: number | null = null;
   const maxParam = searchParams.get('max');
   if (maxParam !== null && maxParam !== '') {
@@ -40,14 +38,14 @@ export function parseQueryToFilters(
     }
   }
 
-  // ensure min <= max when both are present
+  // Убеждаемся что min <= max когда оба присутствуют
   if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
     const tmp = minPrice;
     minPrice = maxPrice;
     maxPrice = tmp;
   }
 
-  // parse stock (truthy values)
+  // Парсим наличие (truthy значения)
   const stockParam = searchParams.get('stock');
   const inStock =
     stockParam === '1' ||
@@ -55,7 +53,7 @@ export function parseQueryToFilters(
     stockParam === 'yes' ||
     stockParam === 'on';
 
-  // parse rating
+  // Парсим рейтинг
   let rating: number | null = null;
   const ratingParam = searchParams.get('rating');
   if (ratingParam !== null && ratingParam !== '') {
@@ -76,8 +74,7 @@ export function parseQueryToFilters(
 }
 
 /**
- * Convert a Filters object back into URLSearchParams. Only filters
- * differing from their default values are included to keep URLs clean.
+ * Конвертирует объект Filters обратно в URLSearchParams.
  */
 export function filtersToQuery(filters: Filters): URLSearchParams {
   const params = new URLSearchParams();
